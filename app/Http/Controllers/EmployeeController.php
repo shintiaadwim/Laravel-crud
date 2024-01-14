@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use PDF;
 use App\Models\Employee;
+use App\Models\Religion;
 use Illuminate\Http\Request;
 use App\Exports\EmployeeExport;
 use App\Imports\EmployeeImport;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Redirect;
 
 class EmployeeController extends Controller
 {
@@ -15,20 +18,27 @@ class EmployeeController extends Controller
     {
         if ($request->has('search')) {
             $data = Employee::where('nama', 'LIKE', '%' . $request->search . '%')->paginate(5);
+            Session::put('halaman_url', request()>$request->fullUrl());
         } else {
             $data = Employee::paginate(5);
+            Session::put('halaman_url', request()>$request->fullUrl());
         }
         return view('datapegawai', compact('data'));
     }
 
     public function show()
     {
-        $data = Employee::all();
-        return view('add-data', compact('data'));
+        $dataagama = Religion::all();
+        return view('add-data', compact('dataagama'));
     }
 
     public function create(Request $request)
     {
+        $this->validate($request, [
+            'nama' => 'required|min:7|max:20',
+            'notelpon' => 'required|min:11|max:12',
+        ]);
+
         $data = Employee::create($request->all());
         if ($request->hasFile('foto')) {
             $request->file('foto')->move('fotopegawai/', $request->file('foto')->getClientOriginalName());
@@ -49,6 +59,9 @@ class EmployeeController extends Controller
     {
         $data = Employee::find($id);
         $data->update($request->all());
+        if(session('halaman_url')){
+            return Redirect(session('halaman_url'))->with('success', 'Data Berhasil di Update!');
+        }
 
         return redirect()->route('pegawai')->with('success', 'Data Berhasil di Update!');
     }
