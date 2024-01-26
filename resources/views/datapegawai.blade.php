@@ -107,7 +107,7 @@
                                         </td>
                                         <td>{{ $row->tanggal_lahir }}</td>
                                         <td>{{ $row->jeniskelamin }}</td>
-                                        <td>{{ $row->id_religions }}</td>
+                                        <td>{{ $row->religions->nama }}</td>
                                         <td>0{{ $row->notelpon }}</td>
                                         <td>{{ $row->created_at->format('D M Y') }}</td>
                                         <td>
